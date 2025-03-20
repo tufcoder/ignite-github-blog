@@ -75,7 +75,39 @@ export const PostSocialsContainer = styled.ul`
 `
 
 export const PostContentContainer = styled.section`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   padding: 2.5rem 2rem;
+
+  ul, ol {
+    padding-inline-start: 1.25rem;
+
+    li {
+      list-style-type: disc;
+    }
+  }
+
+  /* table {
+    max-width: 800px;
+    margin: 0 auto;
+
+    td {
+      vertical-align: top;
+      padding: 5px 10px;
+    }
+  } */
+
+  pre {
+    padding: 1rem;
+    background-color: ${props => props.theme['base-input']};
+    code {
+    }
+  }
+
+  a {
+    color: ${props => props.theme.blue};
+  }
 
   ${above('notebook')} {
     max-width: ${pxToRem(864)};

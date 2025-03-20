@@ -1,10 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useContext } from 'react'
 import { NavLink, useParams } from 'react-router'
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
+import { GithubContext } from '../../contexts/GithubContext'
 
 import { Icons } from '../../components/Icons'
 import { Link } from '../../components/Link'
 
-import { api } from '../../lib/axios'
 import { formatTimeBRL } from '../../utils/functions'
 
 import {
@@ -14,42 +17,23 @@ import {
   PostSocialsContainer,
 } from './styles'
 
-interface PostData {
-  title: string
-  body: string
-  created_at: string
-  comments: string
-  html_url: string
-  user: {
-    login: string
-  }
-}
-
 export function Post() {
   const { issue } = useParams<{ issue: string }>()
-  const [post, setPost] = useState<PostData | null>(null)
+  const { user, issues } = useContext(GithubContext)
 
-  const getPostData = useCallback(
-    async () => {
-      try {
-        const response = await api.get<PostData>(
-          `/repos/tufcoder/ignite-github-blog/issues/${issue}`,
-        )
-        // console.log(response.data)
-        setPost(response.data)
-      } catch (error) {
-        console.error(`Error fetching issue number: ${issue}`, error)
-      }
-    },
-    [issue]
-  )
+  if (!issue) {
+    return <div>Post não encontrado.</div>
+  }
 
-  useEffect(
-    () => {
-      getPostData()
-    }
-    , [getPostData]
-  )
+  if (!issues) {
+    return <div>Carregando posts...</div>
+  }
+
+  const post = issues?.find(item => item.number === parseInt(issue))
+
+  if (!post) {
+    return <div>Post não encontrado.</div>
+  }
 
   return (
     <PostContainer>
@@ -67,7 +51,7 @@ export function Post() {
         <PostSocialsContainer>
           <li>
             <Icons icon="GithubLogo" />
-            {post?.user.login}
+            {user?.login}
           </li>
           <li>
             <Icons icon="CalendarDot" />
@@ -80,12 +64,16 @@ export function Post() {
           </li>
           <li>
             <Icons icon="ChatCircle" />
-            {post?.comments ?? 0} comentários
+            {post?.comments} comentários
           </li>
         </PostSocialsContainer>
       </PostHeaderContainer>
       <PostContentContainer>
-        {post?.body}
+        <Markdown
+          remarkPlugins={[remarkGfm]}
+        >
+          {post?.body}
+        </Markdown>
       </PostContentContainer>
     </PostContainer>
   )

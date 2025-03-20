@@ -48,7 +48,13 @@ export const CardsContainer = styled.article`
     }
   }
 
-  p {
+  section {
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 0.5rem;
     color: ${(props) => props.theme['base-text']};
   }
 `

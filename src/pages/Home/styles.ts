@@ -93,17 +93,13 @@ export const SocialsContainer = styled.ul`
   }
 `
 
-export const ContentContainer = styled.section`
+export const ContentContainer = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
   max-width: ${pxToRem(864)};
   padding: 1rem 0;
-
-  /* ${above('notebook')} {
-    padding: 1rem 2.5rem;
-  } */
 
   h2 {
     display: flex;

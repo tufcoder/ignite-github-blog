@@ -1,11 +1,15 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { useContext } from 'react'
+import { NavLink } from 'react-router'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+import { GithubContext } from '../../contexts/GithubContext'
 
 import { Card } from '../../components/Card'
 import { Icons } from '../../components/Icons'
 import { Input } from '../../components/Input'
 import { Link } from '../../components/Link'
-
-import { api } from '../../lib/axios'
 
 import {
   CardsContainer,
@@ -15,94 +19,28 @@ import {
   ProfileContainer,
   SocialsContainer,
 } from './styles'
-import { NavLink } from 'react-router'
 
-interface UserData {
-  id: number
-  name: string
-  avatar_url: string
-  html_url: string
-  bio: string
-  company: string | null
-  followers: number
-  login: string
-}
+const searchFormSchema = z.object({
+  query: z.string(),
+})
 
-interface IssueData {
-  number: number
-  title: string
-  body: string
-  created_at: string
-  user: {
-    login: string
-  }
-}
+type SearchFormInputType = z.infer<typeof searchFormSchema>
 
 export function Home() {
-  const [user, setUser] = useState<UserData | null>(null)
-  const [posts, setPosts] = useState<IssueData[] | null>(null)
+  const { user, issues, searchIssues } = useContext(GithubContext)
 
-  const getUser = useCallback(
-    async () => {
-      if (user) return
-      try {
-        const response = await api.get<UserData>('/users/tufcoder')
-        setUser(response.data)
-      } catch (error) {
-        console.error('Error fetching users', error)
-      }
-    },
-    [user]
-  )
+  const {
+    register,
+    handleSubmit,
+    reset
+  } = useForm<SearchFormInputType>({
+    resolver: zodResolver(searchFormSchema)
+  })
 
-  const getIssues = useCallback(
-    async () => {
-      if (posts) return
-      try {
-        const response = await api.get<IssueData[]>(
-          '/repos/tufcoder/ignite-github-blog/issues?labels=blog-post',
-        )
-        setPosts(response.data)
-      } catch (error) {
-        console.error('Error fetching issues', error)
-      }
-    },
-    [posts]
-  )
-
-  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-    const articles = document.querySelectorAll('article')
-    const search = event.currentTarget.value
-
-    if (search !== '') {
-      articles.forEach((article) => {
-        const title = article
-          .querySelector('h2')
-          ?.textContent?.toLocaleLowerCase()
-          .trim()
-        const text = article
-          .querySelector('p')
-          ?.textContent?.toLocaleLowerCase()
-          .trim()
-
-        if (!title?.includes(search) && !text?.includes(search)) {
-          article.style.display = 'none'
-        } else {
-          article.style.display = 'flex'
-        }
-      })
-    } else {
-      articles.forEach((article) => (article.style.display = 'flex'))
-    }
+  function handleSearchIssue(data: SearchFormInputType) {
+    searchIssues(data.query)
+    reset()
   }
-
-  useEffect(
-    () => {
-      getUser()
-      getIssues()
-    },
-    [getIssues, getUser]
-  )
 
   return (
     <HomeContainer>
@@ -130,19 +68,19 @@ export function Home() {
           </SocialsContainer>
         </ProfileContainer>
       </HeaderContainer>
-      <ContentContainer>
+      <ContentContainer onSubmit={handleSubmit(handleSearchIssue)}>
         <h2>
           Publicações
-          <span>{posts?.length ?? 0} publicações</span>
+          <span>{issues?.length ?? 0} publicações</span>
         </h2>
         <Input
           type="text"
-          placeholder="Buscar conteúdo"
-          onChange={handleInputChange}
+          placeholder="Digite um conteúdo e pressione ENTER"
+          {...register('query')}
         />
       </ContentContainer>
-      <CardsContainer $totalCards={posts?.length ?? 0}>
-        {posts?.map((post) => (
+      <CardsContainer $totalCards={issues?.length ?? 0}>
+        {issues?.map((post) => (
           <NavLink key={post.number} to={`/post/${post.number}`}>
             <Card title={post.title} date={post.created_at} text={post.body} />
           </NavLink>
