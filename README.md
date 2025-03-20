@@ -1,8 +1,11 @@
 # Ignite Github Blog
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/5f93e2df-5356-486c-864c-7b90904e2167/deploy-status)](https://app.netlify.com/sites/tufcoder-github-blog/deploys)
 
+> ⚠️
+> Se o projeto estiver em branco, deve ser o PAT do github que expirou tá 😝.
 
-![](assets/desktop-home.png)
+[![](assets/desktop-home.png)](https://tufcoder-github-blog.netlify.app/)
 
 ## Sobre o desafio
 
