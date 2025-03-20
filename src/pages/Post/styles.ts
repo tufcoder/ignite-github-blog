@@ -88,20 +88,26 @@ export const PostContentContainer = styled.section`
     }
   }
 
-  /* table {
-    max-width: 800px;
-    margin: 0 auto;
-
-    td {
-      vertical-align: top;
-      padding: 5px 10px;
-    }
-  } */
-
   pre {
+    overflow-x: auto;
+    max-width: ${pxToRem(300)};
     padding: 1rem;
     background-color: ${props => props.theme['base-input']};
-    code {
+
+    ${above('mobile')} {
+      max-width: ${pxToRem(600)};
+    }
+
+    ${above('tablet')} {
+      max-width: ${pxToRem(700)};
+    }
+
+    ${above('notebook')} {
+      max-width: ${pxToRem(800)};
+    }
+
+    ${above('desktop')} {
+      max-width: ${pxToRem(850)};
     }
   }
 
